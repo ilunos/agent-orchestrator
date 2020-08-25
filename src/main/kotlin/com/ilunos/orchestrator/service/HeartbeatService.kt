@@ -17,7 +17,7 @@ open class HeartbeatService(private val provider: AgentProvider) {
     private val logger = LoggerFactory.getLogger(HeartbeatService::class.java)
 
     @Async
-    @Scheduled(fixedRate = "1m", initialDelay = "30s")
+    @Scheduled(fixedRate = "1m", initialDelay = "2s")
     open fun checkHeartbeats() {
         logger.debug("Starting Heartbeat run for all enabled Agents")
 
