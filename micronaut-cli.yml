@@ -1,0 +1,6 @@
+applicationType: default
+defaultPackage: com.ilunos.orchestrator
+testFramework: junit
+sourceLanguage: kotlin
+buildTool: gradle
+features: [annotation-api, app-name, docker, file-watch, gradle, h2, http-client, junit, kotlin, kotlin-application, kotlin-extension-functions, logback, netty-server, readme, security, security-annotations, security-jwt, shade, yaml]
