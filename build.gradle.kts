@@ -14,6 +14,8 @@ repositories {
     jcenter()
 }
 
+val developmentOnly = configurations.create("developmentOnly")
+
 dependencies {
     kapt(platform("io.micronaut:micronaut-bom:2.0.1"))
     kapt("io.micronaut:micronaut-inject-java")
@@ -33,6 +35,7 @@ dependencies {
     implementation("io.micronaut:micronaut-http-client")
     implementation("io.micronaut:micronaut-http-server-netty")
     implementation("io.micronaut.security:micronaut-security")
+    implementation("io.micronaut.security:micronaut-security-oauth2")
     implementation("io.micronaut.security:micronaut-security-jwt")
     implementation("io.micronaut.kotlin:micronaut-kotlin-extension-functions")
     implementation("io.micronaut.data:micronaut-data-hibernate-jpa")
@@ -63,7 +66,7 @@ kapt {
         arg("micronaut.processing.incremental", true)
         arg("micronaut.processing.annotations", "com.ilunos.orchestrator.*")
         arg("micronaut.processing.group", "com.ilunos.orchestrator")
-        arg("micronaut.processing.module", "agentOrchestrator")
+        arg("micronaut.processing.module", "Agent-Orchestrator")
     }
 }
 
@@ -79,7 +82,6 @@ tasks {
     compileKotlin {
         kotlinOptions {
             jvmTarget = "13"
-            //Will retain parameter names for Java reflection
             javaParameters = true
         }
     }
@@ -98,4 +100,9 @@ tasks {
     test {
         useJUnitPlatform()
     }
+}
+
+tasks.withType<JavaCompile> {
+    classpath += developmentOnly
+    options.compilerArgs.addAll(arrayOf("-XX:TieredStopAtLevel=1", "-Dcom.sun.management.jmxremote"))
 }
