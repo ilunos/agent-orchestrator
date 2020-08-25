@@ -12,7 +12,7 @@ import io.micronaut.http.HttpResponse
 import io.micronaut.http.annotation.*
 import io.micronaut.http.hateoas.JsonError
 
-@Controller("/agent")
+@Controller("/agents")
 class AgentController(private val provider: AgentProvider, private val heartbeat: HeartbeatService) {
 
     @Get
