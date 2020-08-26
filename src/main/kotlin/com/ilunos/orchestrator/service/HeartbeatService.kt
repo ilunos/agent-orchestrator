@@ -36,7 +36,7 @@ open class HeartbeatService(private val provider: AgentProvider) {
 
         val httpClient = DefaultHttpClient(agent.url)
 
-        return httpClient.exchange("/")
+        return httpClient.exchange("/heartbeat")
                 .onErrorReturn {
                     agent.status = AgentStatus.UNREACHABLE
                     HttpResponse.notFound()
