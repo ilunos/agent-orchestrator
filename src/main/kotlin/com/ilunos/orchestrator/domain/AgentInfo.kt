@@ -10,7 +10,7 @@ import javax.persistence.Id
 import javax.persistence.Table
 
 @Entity
-@Table(name = "agent")
+@Table(name = "AGENT")
 data class AgentInfo(
 
         @Id
