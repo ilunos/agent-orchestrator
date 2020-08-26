@@ -55,6 +55,14 @@ micronaut:
   ###                 Security configuration
   ################################################################
 
+# Require Agents to provide a token as password when registering.
+# If not set registering will require no password at all!
+# Uncomment and set custom token for registering.
+# The same value will have to be configured in the Agent for successful registration
+#
+# WARNING: Only remove the "#" do not add or remove spaces!
+#  register-token: test
+
   security:
     enabled: false                          # Set this to false to turn off security completely (NOT RECOMMENDED)
     reject-not-found: false                 # Set to true to return a 401 instead of 404 on pages not found
@@ -71,6 +79,14 @@ micronaut:
           client-secret: <client-secret>    # Put your generated client secret here if you are using access_type = confidential
           openid:
             issuer: <http://issuer/url>
+
+    intercept-url-map:
+      - pattern: /agents/**/api/**
+        access:
+          - isAnonymous()
+      - pattern: /agents/**/api/
+        access:
+          - isAnonymous()
 
 
   ################################################################
