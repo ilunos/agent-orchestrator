@@ -7,5 +7,7 @@ enum class AgentStatus {
     CONNECTED,
     UNREACHABLE,
     ALREADY_EXISTING,
-    DISCONNECTED
+    NOT_EXISTING,
+    DISCONNECTED,
+    DELETED
 }

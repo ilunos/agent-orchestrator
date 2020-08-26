@@ -34,6 +34,13 @@ class AgentProvider(private val agentRepository: AgentRepository) {
         agentRepository.update(agentInfo)
     }
 
+    fun delete(id: Long): AgentStatus {
+        val agent = get(id) ?: return AgentStatus.NOT_EXISTING
+
+        agentRepository.delete(agent)
+        return AgentStatus.DELETED
+    }
+
     fun setUnreachable(agentInfo: AgentInfo) {
         agentInfo.status = AgentStatus.UNREACHABLE
         update(agentInfo)

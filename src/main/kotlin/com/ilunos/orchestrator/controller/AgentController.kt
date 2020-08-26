@@ -34,6 +34,14 @@ class AgentController(private val provider: AgentProvider, private val heartbeat
         return AgentRegisterResponse(provider.register(agent.toAgentInfo()))
     }
 
+    @Delete("{id}")
+    @Secured("AGENT_ORCHESTRATOR_EDIT")
+    fun delete(id: Long): Pair<String, AgentStatus> {
+        val status = provider.delete(id)
+        if (status == AgentStatus.NOT_EXISTING) throw AgentNotFoundException(id)
+        return "status" to status
+    }
+
     @Get("/{id}/enable")
     @Secured("AGENT_ORCHESTRATOR_EDIT")
     fun enable(id: Long): AgentInfo {
