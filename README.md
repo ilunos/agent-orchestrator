@@ -41,7 +41,7 @@ docker run --name ilunos/agent-orchestrator --publish 8080:8080 --volume
 
 # Important TODOS
 - Implement Security
-    - Configurable Password to prevent anyone from registering
-    - Secure Enable / Disable Agent endpoints
+    - Configurable Password to prevent anyone from registering ✓
+    - Secure Enable / Disable Agent endpoints ✓
     - Do we allow anyone to use the proxy and let the agent handle auth?
 - Do all the things

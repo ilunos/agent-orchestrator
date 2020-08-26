@@ -17,14 +17,14 @@ import io.reactivex.Flowable
 import org.reactivestreams.Publisher
 import java.util.stream.Collectors
 
-@Filter("/agent/**/api/**", "/agent/**/api/")
+@Filter("/agents/**/api/**", "/agents/**/api/")
 class AgentProxyFilter(
         private val client: ProxyHttpClient,
         private val provider: AgentProvider
 ) : OncePerRequestHttpServerFilter() {
 
     override fun doFilterOnce(request: HttpRequest<*>, chain: ServerFilterChain): Publisher<MutableHttpResponse<*>> {
-        val groups = regex.find(request.uri.path)?.groups ?: throw IllegalAgentId(request.uri.path.removePrefix("/agent/").substringBefore("/"))
+        val groups = regex.find(request.uri.path)?.groups ?: throw IllegalAgentId(request.uri.path.removePrefix("/agents/").substringBefore("/"))
         if (groups.size != 3) throw IllegalAgentId(groups.stream().map { it?.value }.collect(Collectors.joining()))
 
         val agent = provider.get(groups[1]!!.value.toLong()) ?: throw AgentNotFoundException(groups[1]!!.value.toLong())
@@ -49,6 +49,6 @@ class AgentProxyFilter(
     }
 
     companion object {
-        private val regex = Regex("/agent/([0-9]+)/api(/.+|/|)")
+        private val regex = Regex("/agents/([0-9]+)/api(/.+|/|)")
     }
 }
