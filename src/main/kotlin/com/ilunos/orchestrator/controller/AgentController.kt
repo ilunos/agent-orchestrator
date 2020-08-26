@@ -11,26 +11,31 @@ import com.ilunos.orchestrator.service.HeartbeatService
 import io.micronaut.http.HttpResponse
 import io.micronaut.http.annotation.*
 import io.micronaut.http.hateoas.JsonError
+import io.micronaut.security.annotation.Secured
 
 @Controller("/agents")
 class AgentController(private val provider: AgentProvider, private val heartbeat: HeartbeatService) {
 
     @Get
+    @Secured("AGENT_ORCHESTRATOR_VIEW")
     fun list(): List<AgentInfo> {
         return provider.getAll()
     }
 
     @Get("/{id}")
+    @Secured("AGENT_ORCHESTRATOR_VIEW")
     fun get(id: Long): AgentInfo {
         return provider.get(id) ?: throw AgentNotFoundException(id)
     }
 
     @Put
+    @Secured("AGENT_ORCHESTRATOR_REGISTER")
     fun register(@Body agent: AgentRegisterInfo): AgentRegisterResponse {
         return AgentRegisterResponse(provider.register(agent.toAgentInfo()))
     }
 
     @Get("/{id}/enable")
+    @Secured("AGENT_ORCHESTRATOR_EDIT")
     fun enable(id: Long): AgentInfo {
         val agent = provider.get(id) ?: throw AgentNotFoundException(id)
 
@@ -43,6 +48,7 @@ class AgentController(private val provider: AgentProvider, private val heartbeat
     }
 
     @Get("/{id}/disable")
+    @Secured("AGENT_ORCHESTRATOR_EDIT")
     fun disable(id: Long): AgentInfo {
         val agent = provider.get(id) ?: throw AgentNotFoundException(id)
 
@@ -54,6 +60,7 @@ class AgentController(private val provider: AgentProvider, private val heartbeat
     }
 
     @Get("/{id}/refresh")
+    @Secured("AGENT_ORCHESTRATOR_EDIT")
     fun refresh(id: Long): AgentInfo {
         val agent = provider.get(id) ?: throw AgentNotFoundException(id)
 
