@@ -36,7 +36,7 @@ java -jar build/libs/agent-orchestrator-[VERSION]-all.jar
 
 Running in Docker:
 ```
-docker run --name ilunos/agent-orchestrator --publish 8080:8080 --volume 
+docker run --name ilunos/agent-orchestrator --publish 8080:8080 --volume config:/config ilunos/agent-orchestrator:[VERSION]
 ```
 
 # Important TODOS
