@@ -1,0 +1,95 @@
+################################################################
+###                    *** WARNING ***
+################################################################
+###
+### Use a proper text editor when editing this file.
+### Do not use tab characters in this file, use spaces.
+###
+### Keep at least one space after a colon, like so:
+###
+###   key: value
+###
+###
+### Never edit or add a value to lines that have no default value, like:
+###
+###   micronaut:
+###
+###
+### Just leave them be. A default value may be an empty string like so: ""
+###
+###
+### You can wrap most values into quotation marks, except numbers and booleans:
+###
+###   someUrl: "http://example.com"
+###   someToken: "123.qwe.456[DFG="
+###   somePortNumber: 22
+###   useSomeFeature: true
+###
+###
+### You can have a list of things like this:
+###
+###   listOfStrings: ["string1", "string2", "string3"]
+###
+### or like this:
+###
+###   listOfStrings:
+###     - "string1"
+###     - "string2"
+###     - "string3"
+###
+###
+### More information on correctly formatting yaml files: http://www.yaml.org/start.html
+
+
+################################################################
+###                 Basic configuration
+################################################################
+
+micronaut:
+  server:
+    host: localhost                         # Hostname to use
+    port: 8080                              # Server Port Change this if the Port is already in use
+
+
+  ################################################################
+  ###                 Security configuration
+  ################################################################
+
+  security:
+    enabled: false                          # Set this to false to turn off security completely (NOT RECOMMENDED)
+    reject-not-found: false                 # Set to true to return a 401 instead of 404 on pages not found
+    authentication: bearer                  # Authentication type, used by keycloak. Should not be changed
+
+    basic-auth:
+      development: true                     # Set to false to disable builtin development accounts
+
+    oauth2:
+      enabled: false                        # Set to true to enable oauth2 / keycloak authentication.
+      clients:
+        keycloak:
+          client-id: agent-orchestrator     # Client id of the client generated in keycloak
+          client-secret: <client-secret>    # Put your generated client secret here if you are using access_type = confidential
+          openid:
+            issuer: <http://issuer/url>
+
+
+  ################################################################
+  ###                   Client configuration
+  ################################################################
+
+  http:
+    client:
+      connect-timeout: 5s                   # Connection timeout used by the Heartbeat Service.
+
+---
+
+################################################################
+###                Datasource configuration
+################################################################
+
+datasources:
+  default:
+    url: jdbc:h2:file:./config/db/agent-orchestrator;DB_CLOSE_ON_EXIT=FALSE
+    driverClassName: org.h2.Driver
+    username: sa
+    password: ''

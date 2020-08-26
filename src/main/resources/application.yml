@@ -1,0 +1,21 @@
+micronaut:
+  application:
+    name: Agent-Orchestrator
+
+  security:
+    basic-auth:
+      enabled: true
+
+---
+
+jpa:
+  default:
+    entity-scan:
+      packages: 'com.ilunos.orchestrator.domain'
+    properties:
+      hibernate:
+        hbm2ddl:
+          auto: update
+        bytecode:
+          provider: javassist
+        show_sql: false
