@@ -8,8 +8,6 @@ import io.micronaut.data.repository.CrudRepository
 @Repository
 interface AgentRepository : CrudRepository<AgentInfo, Long> {
 
-    fun findByName(name: String): AgentInfo
-
     fun existsByUrl(name: String): Boolean
 
     @Query("SELECT * FROM agent WHERE enabled = true", nativeQuery = true)
