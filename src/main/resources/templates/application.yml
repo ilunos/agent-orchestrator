@@ -64,9 +64,9 @@ micronaut:
 #  register-token: test
 
   security:
-    enabled: false                          # Set this to false to turn off security completely (NOT RECOMMENDED)
+    enabled: true                           # Set this to false to turn off security completely (NOT RECOMMENDED)
     reject-not-found: false                 # Set to true to return a 401 instead of 404 on pages not found
-    authentication: idtoken                  # Authentication type, used by keycloak. Should not be changed
+    authentication: idtoken                 # Authentication type, used by keycloak. Should not be changed
 
     basic-auth:
       enabled: true
@@ -88,6 +88,9 @@ micronaut:
       - pattern: /agents/**/api/
         access:
           - isAnonymous()
+      - pattern: /**
+        access:
+          - isAuthenticated()
 
 
   ################################################################
