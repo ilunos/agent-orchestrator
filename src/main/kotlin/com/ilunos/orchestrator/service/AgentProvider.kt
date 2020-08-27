@@ -10,7 +10,7 @@ class AgentProvider(private val agentRepository: AgentRepository) {
 
     fun register(agentInfo: AgentInfo): AgentStatus {
         if (agentRepository.existsById(agentInfo.id)) return AgentStatus.ALREADY_EXISTING
-        if (agentRepository.existsByName(agentInfo.name)) return AgentStatus.ALREADY_EXISTING
+        if (agentRepository.existsByUrl(agentInfo.url.toString())) return AgentStatus.ALREADY_EXISTING
 
         agentInfo.status = AgentStatus.CREATED
         agentRepository.save(agentInfo)

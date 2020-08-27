@@ -10,7 +10,7 @@ interface AgentRepository : CrudRepository<AgentInfo, Long> {
 
     fun findByName(name: String): AgentInfo
 
-    fun existsByName(name: String): Boolean
+    fun existsByUrl(name: String): Boolean
 
     @Query("SELECT * FROM agent WHERE enabled = true", nativeQuery = true)
     fun findAllEnabled(): List<AgentInfo>

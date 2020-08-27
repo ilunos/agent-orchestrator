@@ -4,13 +4,10 @@ package com.ilunos.orchestrator.domain
 
 import java.net.InetAddress
 import java.net.URL
-import javax.persistence.Entity
-import javax.persistence.GeneratedValue
-import javax.persistence.Id
-import javax.persistence.Table
+import javax.persistence.*
 
 @Entity
-@Table(name = "AGENT")
+@Table(name = "AGENT", uniqueConstraints = [UniqueConstraint(columnNames = ["url"])])
 data class AgentInfo(
 
         @Id
