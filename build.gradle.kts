@@ -10,6 +10,7 @@ version = "0.1"
 group = "com.ilunos.orchestrator"
 
 repositories {
+    maven("https://dl.bintray.com/nanabell/ilunos")
     mavenCentral()
     jcenter()
 }
@@ -26,6 +27,7 @@ dependencies {
     implementation(kotlin("stdlib-jdk8"))
     implementation(kotlin("reflect"))
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.8")
+    implementation("com.ilunos.common:common:1.0.1")
 
     implementation(platform("io.micronaut:micronaut-bom:2.0.3"))
     implementation("io.micronaut:micronaut-inject")
