@@ -1,53 +1,113 @@
 package com.ilunos.orchestrator.service
 
-import com.ilunos.orchestrator.domain.AgentInfo
-import com.ilunos.orchestrator.domain.AgentStatus
+import com.ilunos.orchestrator.domain.Agent
+import com.ilunos.orchestrator.domain.AgentConnectRequest
+import com.ilunos.orchestrator.domain.AgentConnectResponse
 import com.ilunos.orchestrator.repository.AgentRepository
 import javax.inject.Singleton
 
 @Singleton
-class AgentProvider(private val agentRepository: AgentRepository) {
+class AgentProvider(private val repository: AgentRepository) {
 
-    fun register(agentInfo: AgentInfo): AgentStatus {
-        if (agentRepository.existsById(agentInfo.id)) return AgentStatus.ALREADY_EXISTING
-        if (agentRepository.existsByUrl(agentInfo.url)) return AgentStatus.ALREADY_EXISTING
+    private val agents: MutableList<Agent> = repository.findAll().toMutableList()
 
-        agentInfo.status = AgentStatus.CREATED
-        agentRepository.save(agentInfo)
+    fun create(acr: AgentConnectRequest, ip: String): AgentConnectResponse {
+        val agent = repository.save(Agent(
+                token = generateRandomToken(),
+                name = acr.name,
+                hostname = acr.hostname,
+                ip = ip,
+                port = acr.port,
+                connected = true,
+                authorized = false,
+                enabled = false,
+                lastConnected = System.currentTimeMillis()
+        ))
 
-        return AgentStatus.CREATED
+        agents.add(agent)
+        return AgentConnectResponse.formSuccess(agent.token)
     }
 
-    fun getAll(): List<AgentInfo> {
-        return agentRepository.findAll().toList()
+    fun findByToken(token: String?) = agents.firstOrNull { it.token == token }?.id ?: -1
+    fun findByNameAndIp(name: String, ip: String) = agents.firstOrNull { it.name == name && it.ip == ip }?.id ?: -1
+    fun findByNameAndHostname(name: String, hostname: String) = agents.firstOrNull { it.name == name && it.hostname == hostname }?.id ?: -1
+
+    fun get(id: Long): Agent? = agents.firstOrNull { it.id == id }
+    fun getAll(): List<Agent> = agents
+
+    fun authorize(id: Long): Agent? {
+        val agent = get(id) ?: return null
+
+        agent.authorized = true
+        repository.save(agent)
+        return agent
     }
 
-    fun getAllEnabled(): List<AgentInfo> {
-        return agentRepository.findAllEnabled()
+    fun unauthorize(id: Long): Agent? {
+        val agent = get(id) ?: return null
+
+        agent.authorized = false
+        repository.save(agent)
+        return agent
     }
 
-    fun get(id: Long): AgentInfo? {
-        return agentRepository.findById(id).orElse(null)
+    fun enable(id: Long): Agent? {
+        val agent = get(id) ?: return null
+
+        agent.enabled = true
+        repository.save(agent)
+        return agent
     }
 
-    fun update(agentInfo: AgentInfo) {
-        agentRepository.update(agentInfo)
+    fun disable(id: Long): Agent? {
+        val agent = get(id) ?: return null
+
+        agent.enabled = false
+        repository.save(agent)
+        return agent
     }
 
-    fun delete(id: Long): AgentStatus {
-        val agent = get(id) ?: return AgentStatus.NOT_EXISTING
+    fun setConnected(id: Long): Agent? {
+        val agent = get(id) ?: return null
 
-        agentRepository.delete(agent)
-        return AgentStatus.DELETED
+        agent.connected = true
+        agent.lastConnected = System.currentTimeMillis()
+        return agent
     }
 
-    fun setUnreachable(agentInfo: AgentInfo) {
-        agentInfo.status = AgentStatus.UNREACHABLE
-        update(agentInfo)
+    fun setDisconnected(id: Long): Agent? {
+        val agent = get(id) ?: return null
+
+        agent.connected = false
+        return agent
     }
 
-    fun setReachable(agentInfo: AgentInfo) {
-        agentInfo.status = AgentStatus.CONNECTED
-        update(agentInfo)
+    fun update(id: Long , acr: AgentConnectRequest, ipAddress: String): AgentConnectResponse {
+        val agent = get(id) ?: return AgentConnectResponse.fromError("UnknownAgent")
+
+        agent.name =  acr.name
+        agent.hostname = acr.hostname
+        agent.ip = ipAddress
+        agent.port = acr.port
+        setConnected(id)
+
+        repository.update(agent)
+        return AgentConnectResponse.formSuccess(agent.token)
+    }
+
+    fun delete(id: Long): Agent? {
+        val agent = get(id) ?: return null
+
+        agents.remove(agent)
+        repository.delete(agent)
+        return agent.copy()
+    }
+
+    private fun generateRandomToken(): String {
+        return (1..20).map { passwordChars.random() }.joinToString("")
+    }
+
+    companion object {
+        val passwordChars = ('a'..'z') + ('A'..'Z') + ('0'..'9') + '-' + '_'
     }
 }

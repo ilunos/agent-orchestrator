@@ -1,14 +1,13 @@
 package com.ilunos.orchestrator.service
 
-import com.ilunos.orchestrator.domain.AgentInfo
-import com.ilunos.orchestrator.domain.AgentStatus
-import io.micronaut.http.HttpResponse
+import com.ilunos.orchestrator.domain.Agent
 import io.micronaut.http.HttpStatus
 import io.micronaut.http.client.netty.DefaultHttpClient
 import io.micronaut.scheduling.annotation.Async
 import io.micronaut.scheduling.annotation.Scheduled
 import io.reactivex.Flowable
 import org.slf4j.LoggerFactory
+import java.net.URL
 import javax.inject.Singleton
 
 @Singleton
@@ -19,38 +18,38 @@ open class HeartbeatService(private val provider: AgentProvider) {
     @Async
     @Scheduled(fixedRate = "1m", initialDelay = "2s")
     open fun checkHeartbeats() {
-        logger.debug("Starting Heartbeat run for all enabled Agents")
-
-        val agents = provider.getAllEnabled()
-        logger.debug("Received ${agents.size} enabled agent/s")
-
-        for (agent in agents) {
-            checkHeartbeat(agent).subscribe {
-                provider.update(it)
-            }
+        val agents = provider.getAll()
+        if (agents.isEmpty()) {
+            logger.trace("No Agents registered skipping heartbeat check")
+            return
         }
+
+        logger.debug("Starting Heartbeat check for ${agents.size} agent/s")
+        Flowable.fromIterable(agents)
+                .flatMap { checkHeartbeat(it) }
+                .collect({ mutableListOf<Agent>() }, { t1, t2 -> if (t2.connected) t1.add(t2) })
+                .subscribe { t1, t2 ->
+                    logger.debug("Completed Heartbeat check. Result: ${t1.size}/${agents.size} agent/s available.")
+                }
     }
 
-    fun checkHeartbeat(agent: AgentInfo): Flowable<AgentInfo> {
-        logger.debug("Checking Heartbeat for $agent")
+    fun checkHeartbeat(agent: Agent): Flowable<Agent> {
+        logger.trace("Starting Heartbeat check for $agent")
 
-        val httpClient = DefaultHttpClient(agent.url)
+        val httpClient = DefaultHttpClient(URL("http://${agent.ip}:${agent.port}")) // TODO: Investigate Warning
 
-        return httpClient.exchange("/heartbeat")
-                .onErrorReturn {
-                    agent.status = AgentStatus.UNREACHABLE
-                    HttpResponse.notFound()
-                }.doOnNext {
-                    if (it.status == HttpStatus.OK) {
-                        agent.status = AgentStatus.CONNECTED
-                        agent.lastCommunication = System.currentTimeMillis()
-                    } else {
-                        agent.status = AgentStatus.UNREACHABLE
-                    }
+        return httpClient.exchange("/heartbeat").map {
+            if (it.status == HttpStatus.OK)
+                provider.setConnected(agent.id)
 
-                    logger.debug("Heartbeat check completed for agent $agent")
-                }.doFinally { httpClient.close() }
-                .map { agent }
+            agent
+        }.onErrorReturn {
+            provider.setDisconnected(agent.id)
+            agent
+        }.doFinally {
+            logger.trace("Completed Heartbeat check for $agent. Connected: ${agent.connected}")
+            httpClient.close()
+        }
     }
 
 }
