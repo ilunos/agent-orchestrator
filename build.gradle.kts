@@ -17,7 +17,7 @@ repositories {
 val developmentOnly = configurations.create("developmentOnly")
 
 dependencies {
-    kapt(platform("io.micronaut:micronaut-bom:2.0.1"))
+    kapt(platform("io.micronaut:micronaut-bom:2.0.3"))
     kapt("io.micronaut:micronaut-inject-java")
     kapt("io.micronaut:micronaut-validation")
     kapt("io.micronaut.security:micronaut-security-annotations")
@@ -27,7 +27,7 @@ dependencies {
     implementation(kotlin("reflect"))
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.8")
 
-    implementation(platform("io.micronaut:micronaut-bom:2.0.1"))
+    implementation(platform("io.micronaut:micronaut-bom:2.0.3"))
     implementation("io.micronaut:micronaut-inject")
     implementation("io.micronaut:micronaut-validation")
     implementation("io.micronaut:micronaut-runtime")
